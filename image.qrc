@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/">
+        <file>img/Logo.png</file>
+        <file>img/USB-fill.png</file>
+        <file>img/电磁阀.png</file>
+        <file>img/风扇.png</file>
+        <file>img/设定.png</file>
+        <file>img/手动点击.png</file>
+        <file>img/btncheckoff2.png</file>
+        <file>img/btncheckon2.png</file>
+    </qresource>
+</RCC>
