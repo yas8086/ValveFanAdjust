@@ -42,6 +42,10 @@ MainWindow::MainWindow(QWidget *parent) :
     tim->setInterval(1000);
     run_time_count = 0;
     connect(tim,SIGNAL(timeout()),this,SLOT(runtime_acc()));
+    //电磁阀
+    ValveStatusRadioGroup = new QButtonGroup();
+    ValveStatusRadioGroup->addButton(ui->radioButtonValveClose,0);
+    ValveStatusRadioGroup->addButton(ui->radioButtonValveOpen,1);
 
 }
 //定时器槽函数
@@ -78,7 +82,7 @@ bool MainWindow::eventFilter(QObject* watched, QEvent* event)
 }
 //串口发送数据
 //deviceId PWM设定：1         电磁阀设定：2      手动开启电磁阀：3
-void MainWindow::serialSendData(uint8_t deviceId,uint8_t value1,uint8_t value2)
+void MainWindow::serialSendData(uint8_t deviceId,uint8_t value1,uint8_t value2,uint8_t value3,uint8_t value4)
 {
     QVector<uint8_t> dataSend;
     uint16_t crc16Value;
@@ -87,7 +91,9 @@ void MainWindow::serialSendData(uint8_t deviceId,uint8_t value1,uint8_t value2)
     dataSend.append(deviceId);
     dataSend.append(value1);
     dataSend.append(value2);
-    crc16Value = crc16Calc(dataSend.data(),5);
+    dataSend.append(value3);
+    dataSend.append(value4);
+    crc16Value = crc16Calc(dataSend.data(),7);
     dataSend.append(crc16Value >> 8);
     dataSend.append(crc16Value & 0XFF);
 
@@ -97,84 +103,50 @@ void MainWindow::serialSendData(uint8_t deviceId,uint8_t value1,uint8_t value2)
     dataSend.clear();
 }
 //串口接收数据
-//void MainWindow::slotrevserialmsg()
-//{
-//    QByteArray msg;
-//    uint16_t deviceId = 0, deviceValue = 0;
-//    msg = serial.readAll();
-//    if(!msg.isEmpty())
-//    {
-//        if(msg.data()[0]==0x0C)
-//        {
-//            uint16_t crc=crc16Calc((uint8_t*)msg.data(),3);
-//            if((char(crc>>8)==msg[msg.size()-2])&&(char(crc&0xff)==msg[msg.size()-1]))//有符号和无符号比较一定要注意
+//地址码 功能码
+void MainWindow::slotrevserialmsg()
+{
+    QByteArray msg;
+    Rev_data data;
+    Real_Data data1;
+    uint8_t deviceId = 0, deviceValue = 0;
+    msg = serial.readAll();
+    while (msg.size()>=sizeof(Rev_data))
+    {
+        if(msg.data()[0]==0x0E)
+        {
+            //参数通信帧
+            if(msg.data()[1]==0x01)
+            {
+                uint16_t crc=crc16Calc((uint8_t*)msg.data(),12);
+                if((char(crc>>8)==msg[msg.size()-2])&&(char(crc&0xff)==msg[msg.size()-1]))//有符号和无符号比较一定要注意
+                {
+                    memcpy(&data,msg.data(),sizeof (Rev_data));
+                    Reslove_Data(data,data1);
+                    Refresh(data1);
+                    msg.remove(0,sizeof (Rev_data));
+                }
+            }
+            else{
+                msg.remove(0,1);
+            }
+            //应答帧
+//            if(msg.data()[1]==0x01)
 //            {
-//                deviceId = msg[1];
-//                deviceValue = msg[2];
+//                uint16_t crc=crc16Calc((uint8_t*)msg.data(),11);
+//                if((char(crc>>8)==msg[msg.size()-2])&&(char(crc&0xff)==msg[msg.size()-1]))//有符号和无符号比较一定要注意
+//                {
+//                    memcpy(&data,msg.data(),sizeof (Rev_data));
+//                    Reslove_Data(data,data1);
+//                    Refresh(data1);
+//                    msg.remove(0,sizeof (Rev_data));
+//                }
 //            }
-//        }
-//    }
-//    //deviceId  失败：0  油泵：1  水泵：2  粉阀：3  发动机：4  复位：5
-//    switch (deviceId) {
-//    case 0:
-//        switch (deviceValue){
-//        case 1:
-//            ui->pushButtonOilPump->setChecked(true);
-//            break;
-//        case 2:
-//            ui->pushButtonWaterPump->setChecked(true);
-//            break;
-//        default:
-//            break;
-//        }
-//        QMessageBox::information(nullptr,"提示","打开失败，请重试！");
-//        break;
-//    case 1:
-//        if(deviceValue==1)
-//        {
-//            QMessageBox::information(nullptr,"提示","油泵打开成功");
-//            ui->pushButtonOilPump->setChecked(true);
-//            ui->pushButtonOilPump->setText("油泵已开启，点击关闭");
-//        }
-//        else {
-//            ui->pushButtonOilPump->setText("打开");
-//        }
-//        break;
-//    case 2:
-//        if(deviceValue==1)
-//        {
-//            QMessageBox::information(nullptr,"提示","水泵打开成功");
-//            ui->pushButtonWaterPump->setChecked(true);
-//            ui->pushButtonWaterPump->setText("水泵已开启，点击关闭");
-//        }
-//        else {
-//            ui->pushButtonWaterPump->setText("打开");
-//        }
-//        break;
-//    case 3:
-//        QMessageBox::information(nullptr,"提示","粉阀PWM设置成功");
-//        break;
-//    case 4:
-//        QMessageBox::information(nullptr,"提示","发动机设置成功");
-//        break;
-//    case 5:
-//        //油泵
-//        ui->pushButtonOilPump->setChecked(false);
-//        ui->pushButtonOilPump->setText("打开");
-//        //水泵
-//        ui->pushButtonWaterPump->setChecked(false);
-//        ui->pushButtonWaterPump->setText("打开");
-//        //粉阀
-//        ui->spinBoxPowderValue->setValue(0);
-//        //发动机
-//        ui->spinBoxEngine->setValue(0);
-//        QMessageBox::information(nullptr,"提示","复位成功");
-//        break;
-//    default:
-//        break;
-//    }
-//    msg.clear();
-//}
+
+        }
+        msg.remove(0,1);
+    }
+}
 //串口打开按钮设置
 void MainWindow::on_pushButtonSerial_clicked(bool checked)
 {
@@ -209,7 +181,7 @@ void MainWindow::on_pushButtonSerial_clicked(bool checked)
 void MainWindow::on_pushButtonSetPWM_clicked()
 {
     if(serialIsOpen==true){
-        serialSendData(1,uint8_t(ui->spinBoxPWM->value()),0x00);
+        serialSendData(1,0x00,0x00,0x00,uint8_t(ui->spinBoxPWM->value()));
     }
     else {
         QMessageBox::information(nullptr,"提示","风扇PWM设定失败，串口未打开");
@@ -220,7 +192,11 @@ void MainWindow::on_pushButtonSetValve_clicked()
 {
     if(serialIsOpen==true)
     {
-        serialSendData(2,uint8_t(ui->spinBoxValveIntervals->value()),uint8_t(ui->doubleSpinBoxValveTime->value()*100));
+        uint8_t value1 = (uint16_t(ui->spinBoxValveIntervals->value()*1000)) >> 8;
+        uint8_t value2 = (uint16_t(ui->spinBoxValveIntervals->value()*1000)) & 0xff;
+        uint8_t value3 = (uint16_t(ui->doubleSpinBoxValveTime->value()*1000)) >> 8;
+        uint8_t value4 = (uint16_t(ui->doubleSpinBoxValveTime->value()*1000)) & 0xff;
+        serialSendData(2,value1,value2,value3,value4);
     }else {
         QMessageBox::information(nullptr,"提示","电磁阀设定失败，串口未打开");
     }
@@ -230,10 +206,49 @@ void MainWindow::on_pushButtonSetValve_clicked()
 void MainWindow::on_pushButtonHandOn_clicked()
 {
     if(serialIsOpen==true){
-        serialSendData(3,0x01,0x00);    }
+        serialSendData(3,0x00,0x00,0x00,0x01);    }
     else {
         QMessageBox::information(nullptr,"提示","手动排气失败，串口未打开");
     }
+}
+
+void MainWindow::Refresh(Real_Data data)
+{
+    ui->lineEditT1->setText(QString::number(data.temperature,'f',2));
+    ui->lineEditT2->setText(QString::number(data.shell_temperature,'f',2));
+//    ui->bat_i->setText(QString::number(data.LI_I,'f',2));
+    ValveStatusRadioGroup->button(data.Exhaust_status)->setChecked(true);
+}
+
+void MainWindow::Reslove_Data(Rev_data data,Real_Data &data1 )
+{
+    #pragma pack(1)//设定为1字节对齐
+    union Swap
+    {
+        char a[2];
+        unsigned short b;
+    };
+    #pragma pack(0)//设定为1字节对齐
+    Swap swap;
+
+
+    swap.a[0]=((char *)(&data.temperature))[1];
+    swap.a[1]=((char *)(&data.temperature))[0];
+//    qDebug()<<"swap传入数据后为："<<swap.a[0]<<swap.a[1]<<swap.b;
+    data1.temperature=swap.b/100.00-40;
+
+    swap.a[0]=((char *)(&data.shell_temperature))[1];
+    swap.a[1]=((char *)(&data.shell_temperature))[0];
+    data1.shell_temperature=swap.b/100.00;
+
+    swap.a[0]=((char *)(&data.environment_temperature))[1];
+    swap.a[1]=((char *)(&data.environment_temperature))[0];
+    data1.environment_temperature=swap.b;
+
+    swap.a[0]=((char *)(&data.Exhaust_status))[1];
+    swap.a[1]=((char *)(&data.Exhaust_status))[0];
+    data1.Exhaust_status=swap.b;
+//    qDebug()<<"风扇转速传过来为："<<swap.b<<data1.PWM_VAL;
 }
 
 //16位CRC校验

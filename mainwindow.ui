@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>407</width>
-    <height>437</height>
+    <height>481</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
     <normaloff>:/img/Logo.png</normaloff>:/img/Logo.png</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QGridLayout" name="gridLayout" columnstretch="0,0,0">
+   <layout class="QGridLayout" name="gridLayout" columnstretch="0,0">
     <item row="2" column="0" colspan="2">
      <widget class="QGroupBox" name="GroupBoxSeries">
       <property name="title">
@@ -135,7 +135,7 @@ border-image: url(:/img/btncheckoff2.png);
           <bool>false</bool>
          </property>
          <layout class="QGridLayout" name="gridLayout_13">
-          <item row="0" column="0">
+          <item row="5" column="0">
            <layout class="QHBoxLayout" name="horizontalLayout_14">
             <item>
              <widget class="QLabel" name="label_23">
@@ -172,12 +172,36 @@ border-image: url(:/img/btncheckoff2.png);
             </item>
            </layout>
           </item>
-          <item row="1" column="0">
+          <item row="6" column="0">
            <widget class="QPushButton" name="pushButtonSetPWM">
             <property name="text">
              <string>设定</string>
             </property>
            </widget>
+          </item>
+          <item row="0" column="0">
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <item>
+             <widget class="QLabel" name="label_5">
+              <property name="text">
+               <string>温度1：</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEditT1"/>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_6">
+              <property name="text">
+               <string>温度2：</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEditT2"/>
+            </item>
+           </layout>
           </item>
          </layout>
         </widget>
@@ -203,6 +227,9 @@ border-image: url(:/img/btncheckoff2.png);
           </item>
           <item row="6" column="1" colspan="2">
            <widget class="QDoubleSpinBox" name="doubleSpinBoxValveTime">
+            <property name="maximum">
+             <double>3.000000000000000</double>
+            </property>
             <property name="singleStep">
              <double>0.100000000000000</double>
             </property>
@@ -224,7 +251,7 @@ border-image: url(:/img/btncheckoff2.png);
              <number>1</number>
             </property>
             <property name="maximum">
-             <number>100</number>
+             <number>60</number>
             </property>
             <property name="value">
              <number>10</number>
@@ -247,14 +274,14 @@ border-image: url(:/img/btncheckoff2.png);
              </widget>
             </item>
             <item>
-             <widget class="QRadioButton" name="radioButtonOpen">
+             <widget class="QRadioButton" name="radioButtonValveOpen">
               <property name="text">
                <string>开</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QRadioButton" name="radioButtonClose">
+             <widget class="QRadioButton" name="radioButtonValveClose">
               <property name="text">
                <string>关</string>
               </property>
@@ -272,6 +299,20 @@ border-image: url(:/img/btncheckoff2.png);
             </property>
             <item>
              <widget class="QPushButton" name="pushButtonHandOn">
+              <property name="styleSheet">
+               <string notr="true">QPushButton {
+    font-size: 14px;
+}
+QPushButton:hover{
+	color: red;
+}
+//按钮禁止时的样式
+QPushButton:disabled{
+	color: blue;
+	border-color: brown;
+    background-color: aqua;
+}</string>
+              </property>
               <property name="text">
                <string>点击手动开启一次电磁阀，排气时间1S</string>
               </property>
