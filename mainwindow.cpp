@@ -9,7 +9,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
 
     ui->setupUi(this);
-    setWindowTitle("手动控制风扇电磁阀");
+    setWindowIcon(QIcon(":/Logo.ico"));
+    setWindowTitle("手动控制燃料电池风扇电磁阀（测试用）");
     iconSetPWM.addFile(":/img/设定.png");
     iconSetValve.addFile(":/img/设定.png");
     iconHandOn.addFile(":/img/手动点击.png");
@@ -234,7 +235,6 @@ void MainWindow::Reslove_Data(Rev_data data,Real_Data &data1 )
 
     swap.a[0]=((char *)(&data.temperature))[1];
     swap.a[1]=((char *)(&data.temperature))[0];
-//    qDebug()<<"swap传入数据后为："<<swap.a[0]<<swap.a[1]<<swap.b;
     data1.temperature=swap.b/100.00-40;
 
     swap.a[0]=((char *)(&data.shell_temperature))[1];
@@ -248,7 +248,7 @@ void MainWindow::Reslove_Data(Rev_data data,Real_Data &data1 )
     swap.a[0]=((char *)(&data.Exhaust_status))[1];
     swap.a[1]=((char *)(&data.Exhaust_status))[0];
     data1.Exhaust_status=swap.b;
-//    qDebug()<<"风扇转速传过来为："<<swap.b<<data1.PWM_VAL;
+//    qDebug()<<"swap传入数据后为："<<swap.a[0]<<swap.a[1]<<swap.b<<endl;
 }
 
 //16位CRC校验
