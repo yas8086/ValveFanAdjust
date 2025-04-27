@@ -234,7 +234,7 @@ border-image: url(:/img/btncheckoff2.png);
              <double>0.100000000000000</double>
             </property>
             <property name="value">
-             <double>0.500000000000000</double>
+             <double>0.400000000000000</double>
             </property>
            </widget>
           </item>
@@ -254,7 +254,7 @@ border-image: url(:/img/btncheckoff2.png);
              <number>60</number>
             </property>
             <property name="value">
-             <number>10</number>
+             <number>15</number>
             </property>
            </widget>
           </item>

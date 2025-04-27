@@ -239,7 +239,7 @@ void MainWindow::Reslove_Data(Rev_data data,Real_Data &data1 )
 
     swap.a[0]=((char *)(&data.shell_temperature))[1];
     swap.a[1]=((char *)(&data.shell_temperature))[0];
-    data1.shell_temperature=swap.b/100.00;
+    data1.shell_temperature=swap.b/100.00-40;
 
     swap.a[0]=((char *)(&data.environment_temperature))[1];
     swap.a[1]=((char *)(&data.environment_temperature))[0];
